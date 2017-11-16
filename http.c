@@ -23,7 +23,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "list.h"
 #include "hash.h"
 #include "subr.h"
 
