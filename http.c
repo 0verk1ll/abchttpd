@@ -35,7 +35,7 @@
 
 #define FIELDS		32
 #define FIELD_LEN	1024 
-#define BLOCK_SZ 	4096
+#define BLOCK_SZ 	8192
 #define PATH_MAX 	4096
 #define CLIENTS_MAX	32
 
@@ -47,6 +47,7 @@ struct http_msg{
 	char * status;
 	struct bucket * fields;
 	char * message_body;
+	int clen;
 };
 
 struct connection{
@@ -94,6 +95,7 @@ struct http_msg * hmsg_alloc(){
 	h->status = NULL;
 	set_status(200, &h);
 	h->message_body = NULL;
+	h->clen = 0;
 	return h;
 }
 
@@ -120,36 +122,31 @@ char * make_path(char * req, char * pathbuf)
 	return pathbuf;
 }
 
-char * loadresrc(char * path)
+int loadresrc(char * path, char ** buf)
 {
 	int bytes_read = 0, s = 0, r = 0, bm = 1;
 	char * buffer = NULL;
 	s = open(path, O_RDONLY);
 	if(s < 0)	/* caller check errno and send 404 if doesn't exist */
-		return NULL;	
+		return -1;	
 	buffer = calloc(BLOCK_SZ,1);
 	if(!buffer) die("malloc");
 	while((r = read(s, buffer, BLOCK_SZ)) != -1 && r != 0){ 
 		bytes_read += r;
-		if(bytes_read > bm*BLOCK_SZ){
-			buffer = realloc(buffer, (++bm)*BLOCK_SZ);
-			if(buffer == NULL){
-				die("realloc");
-			}
-		}
 	}
 	close(s);
 	printf("read %i bytes %s\n", bytes_read, path);
-	return buffer;
+	*buf = buffer;
+	return (int)bytes_read;
 }
 
 int send_response(int fd, struct http_msg * htmsg)
 {
 	assert(fd && htmsg);
-	size_t len = 0, slen = 0, clen = 0;
+	size_t slen = 0;
 	char * status = htmsg->status;
 	int fb_len = 100;
-	char * field_buffer = alloca(fb_len);
+	char * field_buffer = calloc(1,fb_len);
 	char * sep = "\r\n";
 
 	slen = strlen(status);
@@ -163,12 +160,15 @@ int send_response(int fd, struct http_msg * htmsg)
 			write(fd, field_buffer, strlen(field_buffer));
 		}
 	}
-	clen = strlen(htmsg->message_body);
-	sprintf(field_buffer, "Content-Length: %zu\n", clen); 
+
+	sprintf(field_buffer, "Content-Length: %i\n", htmsg->clen); 
 	write(fd, field_buffer, strlen(field_buffer));
 	
 	write(fd, sep, strlen(sep));
-	write(fd, htmsg->message_body, clen);
+	int w = 0;
+	w = write(fd, htmsg->message_body, htmsg->clen);
+	printf("wrote %i\n", w);
+	free(field_buffer);
 	return 0;
 }
 int send_code_200(int fd, struct http_msg * response)
@@ -189,6 +189,7 @@ int send_error_404(int fd, struct http_msg * response)
 {
 	set_status(404, &response);
 	response->message_body = "404 Not Found";
+	response->clen = strlen(response->message_body);
 	send_response(fd, response);
 	return 0;
 }
@@ -224,12 +225,15 @@ int handle_get(int fd, char * resource, struct connection * conn)
 
 	pathbuf = alloca(PATH_MAX);
 	char * pb = make_path(resource, pathbuf);
-	p = loadresrc(pb);
+	int clen = loadresrc(pb, &p);
 	if(p){
+		printf("200 %i\n", clen);
 		(*htpr)->message_body = p;
+		(*htpr)->clen = clen;
 		send_code_200(fd, conn->response);
 		free(p);
 	}else{
+		printf("404\n");
 		(*htpr)->message_body = "404";
 		send_error_404(fd, conn->response);
 	}
@@ -240,7 +244,6 @@ int handle_post(int fd, char * action, struct connection * conn)
 	int pfds[2];
 	pid_t forked;
 	struct http_msg * h = conn->response;
-	char * decoded_body;
 	printf("action: %s\n", action);
 
 	assert(conn->request->message_body != NULL);
