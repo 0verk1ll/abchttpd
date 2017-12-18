@@ -35,7 +35,7 @@
 
 #define FIELDS		32
 #define FIELD_LEN	1024 
-#define BLOCK_SZ 	8192
+#define BLOCK_SZ 	64	
 #define PATH_MAX 	4096
 #define CLIENTS_MAX	32
 
@@ -122,24 +122,6 @@ char * make_path(char * req, char * pathbuf)
 	return pathbuf;
 }
 
-int loadresrc(char * path, char ** buf)
-{
-	int bytes_read = 0, s = 0, r = 0, bm = 1;
-	char * buffer = NULL;
-	s = open(path, O_RDONLY);
-	if(s < 0)	/* caller check errno and send 404 if doesn't exist */
-		return -1;	
-	buffer = calloc(BLOCK_SZ,1);
-	if(!buffer) die("malloc");
-	while((r = read(s, buffer, BLOCK_SZ)) != -1 && r != 0){ 
-		bytes_read += r;
-	}
-	close(s);
-	printf("read %i bytes %s\n", bytes_read, path);
-	*buf = buffer;
-	return (int)bytes_read;
-}
-
 int send_response(int fd, struct http_msg * htmsg)
 {
 	assert(fd && htmsg);
@@ -215,6 +197,27 @@ int parse_request(char * buffer, struct http_msg * dest)
 	}
 	free(tokens);
 	return 0;
+}
+
+unsigned long loadresrc(char * path, char ** buf)
+{
+	unsigned long file_size = 0;
+	FILE * file = fopen(path, "r");
+	if(!file) return -1;
+	
+	fseek(file, 0, SEEK_END);
+	file_size = ftell(file);
+	
+	rewind(file);
+	
+	*buf = calloc(file_size, 1);
+	if(!(*buf))
+		return -1;		
+	if(fread(*buf, 1, file_size, file) != file_size){
+		printf("file not completely read\n");	
+		return -1;
+	}
+	return file_size;	
 }
 
 int handle_get(int fd, char * resource, struct connection * conn)
