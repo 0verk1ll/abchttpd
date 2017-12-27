@@ -254,12 +254,6 @@ int handle_post(int fd, char * action, struct connection * conn)
 	if(mblen <= 0){
 		exit(EXIT_FAILURE);
 	}
-/*	decoded_body = calloc(strlen(conn->request->message_body)+1, 1);
-	if(!decoded_body) die("calloc");
-	percdec(decoded_body, conn->request->message_body, mblen);
-	printf("%s\n", conn->request->message_body);
-	printf("%s\n", decoded_body);
-*/
 	int p = pipe(pfds);
 	if(p < 0){
 		perror("pipe");
@@ -275,14 +269,15 @@ int handle_post(int fd, char * action, struct connection * conn)
 		close(pfds[1]);
 		int buffer_size = 1024;
 		int r = 0;
-		char * buffer = alloca(buffer_size);
+		char * buffer = alloca(buffer_size+1);
 		if((r = read(pfds[0], buffer, buffer_size)) < 0){
 			perror("forked_parent_read");
 			buffer = "forked_parent_read";
 		}
-		buffer[r-1] = '\0';
+		buffer[r] = '\0';
 		wait(NULL);
 		h->message_body = buffer;
+		h->clen = strlen(buffer);
 		send_code_200(fd, h);
 	}else if(forked == 0){
 		/* child */
@@ -291,7 +286,7 @@ int handle_post(int fd, char * action, struct connection * conn)
 			perror("dup2");
 			exit(EXIT_FAILURE);
 		}
-		char * fn = "post.py";
+		char * fn = "post.py"; 
 		char * myargv[] = {NULL};
 		char * myenvp[] = {conn->request->message_body, NULL};
 		execve(fn, myargv, myenvp);
