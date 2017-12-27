@@ -1,0 +1,58 @@
+@charset "utf-8";
+
+body {
+  background-color: #99ffdd;
+}
+
+h1, h2, h3 {
+  color: #222;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+p {
+  text-align: center;
+  font-family: serif;
+}
+
+form {
+  text-align: center;
+  font-family: serif;
+}
+
+.fluid {
+	margin-left: auto;
+	margin-right: auto;
+	width: 100%;
+	float: none;
+	display: block;
+}
+
+/* Mobile Layout: 480px and below. */
+
+/* Tablet Layout: 481px to 768px. Inherits styles from: Mobile Layout. */
+
+@media only screen and (min-width: 481px) {
+
+	h2 {
+		font-size: xx-large;
+		text-align: center;
+	}
+
+	p, a, ul, li {
+		font-size: x-large;
+	}
+
+	.fluid {
+		width: 85%;
+	}
+
+}
+/* Desktop Layout: 769px to a max of 1232px.  Inherits styles from: Mobile Layout and Tablet Layout. */
+
+@media only screen and (min-width: 769px) {
+	.fluid {
+		width: 60%;
+	}
+
+}
