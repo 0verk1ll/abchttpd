@@ -1,23 +1,25 @@
 @charset "utf-8";
 
 body {
-  background-color: #99ffdd;
+  background-color: #111;
 }
 
 h1, h2, h3 {
-  color: #222;
+  color: #99ffdd;
   text-align: center;
-  font-family: sans-serif;
+  font-family: monospace;
 }
 
 p {
+  color: #99ffdd;
   text-align: center;
-  font-family: serif;
+  font-family: monospace;
 }
 
 form {
+  color: #99ffdd;
   text-align: center;
-  font-family: serif;
+  font-family: monospace;
 }
 
 .fluid {
