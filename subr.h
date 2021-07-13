@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2021 2017 rdci
 //
-// SPDX-License-Identifier: mit
+// SPDX-License-Identifier: MIT
 
 #pragma once
 /*

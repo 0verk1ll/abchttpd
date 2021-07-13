@@ -1,7 +1,7 @@
 <!--
-SPDX-FileCopyrightText: 2021 2017 rdci
+SPDX-FileCopyrightText: 2017 rdci
 
-SPDX-License-Identifier: mit
+SPDX-License-Identifier: MIT
 -->
 
 [![REUSE status](https://api.reuse.software/badge/github.com/0verk1ll/abchttpd)](https://api.reuse.software/info/github.com/0verk1ll/abchttpd)

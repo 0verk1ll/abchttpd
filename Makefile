@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2021 2017 rdci
 #
-# SPDX-License-Identifier: mit
+# SPDX-License-Identifier: MIT
 
 CC=clang
 CFLAGS=-Wall -Wextra -pedantic -g

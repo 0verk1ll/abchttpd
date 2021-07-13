@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-# SPDX-FileCopyrightText: 2021 2020 rdci and 0verk1ll
+# SPDX-FileCopyrightText: 2020 rdci and 0verk1ll
 #
-# SPDX-License-Identifier: mit
+# SPDX-License-Identifier: MIT
 
 import os
 
