@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 2017 rdci
+//
+// SPDX-License-Identifier: mit
+
 #define _GNU_SOURCE AA
 #define _POSIX_C_SOURCE >= 199309L
 

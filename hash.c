@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 2017 rdci
+//
+// SPDX-License-Identifier: mit
+
 #include "hash.h"
 #include "subr.h"
 

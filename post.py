@@ -1,4 +1,9 @@
 #!/usr/bin/python
+
+# SPDX-FileCopyrightText: 2021 2020 rdci and 0verk1ll
+#
+# SPDX-License-Identifier: mit
+
 import os
 
 print "post received"
