@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2021 2017 rdci
+// SPDX-FileCopyrightText: 2017 rdci
 //
 // SPDX-License-Identifier: MIT
 
